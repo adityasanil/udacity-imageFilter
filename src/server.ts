@@ -1,10 +1,13 @@
-import express from "express";
+// import {  } from "express";
+// import express from "express";
+import * as express from "express";
+
 import bodyParser from "body-parser";
 import { filterImageFromURL, deleteLocalFiles } from "./util/util";
 
 (async () => {
   // Init the Express application
-  const app = express();
+  const app = express.default();
 
   // Set the network port
   const port = process.env.PORT || 8082;
@@ -26,21 +29,24 @@ import { filterImageFromURL, deleteLocalFiles } from "./util/util";
   // RETURNS
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
-  app.get("/filteredimage", async (req, res) => {
-    let { image_url } = req.query;
-    if (!image_url) return res.status(404).send("ERROR! Pass an image url.");
+  app.get(
+    "/filteredimage",
+    async (req: express.Request, res: express.Response) => {
+      let { image_url } = req.query;
+      if (!image_url) return res.status(404).send("ERROR! Pass an image url.");
 
-    filterImageFromURL(image_url)
-      .then(output => {
-        res.status(200).sendFile(output);
-        res.on("finish", () => {
-          deleteLocalFiles([output]);
+      filterImageFromURL(image_url)
+        .then(output => {
+          res.status(200).sendFile(output);
+          res.on("finish", () => {
+            deleteLocalFiles([output]);
+          });
+        })
+        .catch(err => {
+          res.send(422).send("Unprocessable Entity");
         });
-      })
-      .catch(err => {
-        res.send(422).send("Unprocessable Entity");
-      });
-  });
+    }
+  );
 
   /**************************************************************************** */
 
@@ -48,7 +54,7 @@ import { filterImageFromURL, deleteLocalFiles } from "./util/util";
 
   // Root Endpoint
   // Displays a simple message to the user
-  app.get("/", async (req, res) => {
+  app.get("/", async (req: express.Request, res: express.Response) => {
     res.send("try GET /filteredimage?image_url={{}}");
   });
 
