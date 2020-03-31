@@ -30,12 +30,16 @@ import { filterImageFromURL, deleteLocalFiles } from "./util/util";
     let { image_url } = req.query;
     if (!image_url) return res.status(404).send("ERROR! Pass an image url.");
 
-    filterImageFromURL(image_url).then(output => {
-      res.status(200).sendFile(output);
-      res.on("finish", () => {
-        deleteLocalFiles([output]);
+    filterImageFromURL(image_url)
+      .then(output => {
+        res.status(200).sendFile(output);
+        res.on("finish", () => {
+          deleteLocalFiles([output]);
+        });
+      })
+      .catch(err => {
+        res.send(422).send("Unprocessable Entity");
       });
-    });
   });
 
   /**************************************************************************** */
